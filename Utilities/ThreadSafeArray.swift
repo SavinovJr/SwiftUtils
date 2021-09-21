@@ -18,6 +18,12 @@ final class ThreadSafeArray<T> {
         }
     }
 
+    public func append(_ values: [T]) {
+        queue.async(flags: .barrier) {
+            self.array.append(contentsOf: values)
+        }
+    }
+
     public var values: [T] {
         var result = [T]()
         queue.sync {
@@ -27,8 +33,14 @@ final class ThreadSafeArray<T> {
     }
 
     public func removeValueAt(_ index: Int) {
-        queue.async {
+        queue.async(flags: .barrier) {
             self.array.remove(at: index)
+        }
+    }
+
+    public func clear() {
+        queue.async(flags: .barrier) {
+            self.array.removeAll()
         }
     }
 }
